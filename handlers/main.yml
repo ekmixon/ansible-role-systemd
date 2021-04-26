@@ -1,9 +1,11 @@
 ---
 - name: Reload systemd
+  become: true
   ansible.builtin.systemd:
     daemon_reload: yes
 
 - name: Re-execute systemd
+  become: true
   ansible.builtin.systemd:
     daemon_reexec: yes
 ...

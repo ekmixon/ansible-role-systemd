@@ -1,0 +1,32 @@
+---
+- name: Create folder for manager overrides
+  ansible.builtin.file:
+    path: /etc/systemd/system.conf.d
+    state: directory
+
+- name: Install manager overrides
+  ansible.builtin.template:
+    src: manager.conf.j2
+    dest: /etc/systemd/system.conf.d/overrides.conf
+  notify:
+  - Reload systemd
+  - Re-execute systemd
+
+- name: Create service overrides folder
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item.key }}.service.d"
+    state: directory
+  loop: "{{ systemd_services | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Install service overrides
+  ansible.builtin.template:
+    src: service.conf.j2
+    dest: "/etc/systemd/system/{{ item.key }}.service.d/overrides.conf"
+  loop: "{{ systemd_services | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  notify:
+  - Reload systemd
+...
